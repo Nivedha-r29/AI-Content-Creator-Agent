@@ -1,0 +1,381 @@
+{
+  "name": "AI Content Creator Agent",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "cd066393-cfaf-4a0b-a37b-3f6a1c007139",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1BDakz7fiqRDRhPYVJZoyGSwIfWYYOaYQPp7LHnUxysQ",
+          "mode": "list",
+          "cachedResultName": "Content_Agent_Data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1BDakz7fiqRDRhPYVJZoyGSwIfWYYOaYQPp7LHnUxysQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1BDakz7fiqRDRhPYVJZoyGSwIfWYYOaYQPp7LHnUxysQ/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Status",
+              "lookupValue": "Pending"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        208,
+        0
+      ],
+      "id": "d6e04350-5eac-41ba-8260-83f8c2b95843",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "x06h2feWdJWSTz0J",
+          "name": "Google Sheets account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.tavily.com/search",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n \"api_key\": \"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\",\n \"query\": \"{{$json[\"Topic\"]}}\",\n \"search_depth\": \"advanced\",\n \"max_results\": 5\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        416,
+        0
+      ],
+      "id": "e716077e-e9f8-42f7-a10b-7ddf0164872c",
+      "name": "Tavily Research"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Write a professional LinkedIn post in 120-150 words.\n\nTopic: {{$json[\"query\"]}}\n\nMake it engaging and end with a question."
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        624,
+        0
+      ],
+      "id": "98e248b9-9fc7-4a3c-b91e-d0f1ac4364fd",
+      "name": "Message a model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "PmoYf5lRlFTTgr2b",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Write a short engaging tweet (max 280 characters).\n\nTopic: {{$json[\"query\"]}}\n\nAdd 2 relevant hashtags."
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        976,
+        0
+      ],
+      "id": "cb5e1067-59df-4363-a8d9-d9b6f881673c",
+      "name": "Generate X Post",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "PmoYf5lRlFTTgr2b",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Write a short blog summary in 150–200 words.\n\nTopic: {{$json[\"query\"]}}\n\nExplain clearly and make it informative."
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        1328,
+        0
+      ],
+      "id": "7ff0c6b1-6fd0-43e5-a3d8-522b44cbff75",
+      "name": "Generate Blog Summary",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "PmoYf5lRlFTTgr2b",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1BDakz7fiqRDRhPYVJZoyGSwIfWYYOaYQPp7LHnUxysQ",
+          "mode": "list",
+          "cachedResultName": "Content_Agent_Data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1BDakz7fiqRDRhPYVJZoyGSwIfWYYOaYQPp7LHnUxysQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1BDakz7fiqRDRhPYVJZoyGSwIfWYYOaYQPp7LHnUxysQ/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "LinkedIn_Post": "={{$node[\"Message a model\"].json[\"text\"]}}",
+            "X_Post": "={{$node[\"Generate X Post\"].json[\"text\"]}}",
+            "Status": "Completed",
+            "Published_Date": "={{$now}}"
+          },
+          "matchingColumns": [
+            "Blog_Summary"
+          ],
+          "schema": [
+            {
+              "id": "Topic",
+              "displayName": "Topic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "LinkedIn_Post",
+              "displayName": "LinkedIn_Post",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "X_Post",
+              "displayName": "X_Post",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Blog_Summary",
+              "displayName": "Blog_Summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Published_Date",
+              "displayName": "Published_Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1680,
+        0
+      ],
+      "id": "ac861972-e7b3-4759-a283-fc3852fa803d",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "x06h2feWdJWSTz0J",
+          "name": "Google Sheets account 3"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Tavily Research",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tavily Research": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Generate X Post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate X Post": {
+      "main": [
+        [
+          {
+            "node": "Generate Blog Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Blog Summary": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "ed019313-ab92-46b5-a5cd-c3963c697a88",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d076addb9364ba0fdb8383d8f7dcc591b5feb0b7d4b65bae1e9d088235500920"
+  },
+  "id": "UqFBLtwnUj27anQb",
+  "tags": []
+}
